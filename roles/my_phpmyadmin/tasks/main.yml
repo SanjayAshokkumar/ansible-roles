@@ -1,0 +1,37 @@
+---
+# tasks file for my_phpmyadmin
+- name: config EPEL repo
+  # command: subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms && dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y
+  command: dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y
+  when: config_repo == "true"
+  
+- name: Install required packages
+  yum:
+    name: "{{ ListOfPackages }}"
+    state: latest
+
+- name: firewall config
+  firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+  notify: restart firewall
+
+- name: Config PHPMyAdmin for public or priate access
+  template:
+    src: phpMyAdmin.conf
+    dest: /etc/httpd/conf.d/phpMyAdmin.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: config_phpmyadmin == "true"
+  notify: 
+    - restart httpd
+    - restart mysql
+
+- name: Start services [httpd, mysql-server]
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop: "{{ service_list }}"

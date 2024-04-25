@@ -1,0 +1,17 @@
+---
+# defaults file for my_phpmyadmin
+ListOfPackages:
+  - httpd
+  - mysql-server
+  - phpmyadmin
+
+service_list:
+  - httpd
+  - mysqld
+
+php_access: local
+
+config_phpmyadmin: false
+config_repo: false
+
+# link: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
